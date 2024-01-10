@@ -62,7 +62,7 @@ const login = async () => {
     //登录成功提示信息
     ElNotification({
       type: 'success',
-      message: '欢迎回来',
+      message: '欢迎登录',
       title: `HI,${getTime()}好`
     });
     //登录成功加载效果也消失
@@ -108,11 +108,11 @@ const rules = {
   //trigger:触发校验表单的时机 change->文本发生变化触发校验,blur:失去焦点的时候触发校验规则
   username: [
     // { required: true, min: 6, max: 10, message: '账号长度至少六位', trigger: 'change' }
-    { trigger: 'change', validator: validatorUserName }
+    { required: true,trigger: 'change', validator: validatorUserName }
   ],
   password: [
     // { required: true, min: 6, max: 15, message: '密码长度至少6位', trigger: 'change' }
-    { trigger: 'change', validator: validatorPassword }
+    { required: true,trigger: 'change', validator: validatorPassword }
   ]
 }
 </script>

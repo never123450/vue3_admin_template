@@ -14,7 +14,6 @@ import { SET_TOKEN, GET_TOKEN, REMOVE_TOKEN } from '@/utils/token'
 import { constantRoute, asnycRoute, anyRoute } from '@/router/routes'
 
 //引入深拷贝方法
-//@ts-expect-error
 import cloneDeep from 'lodash/cloneDeep'
 import router from '@/router'
 //用于过滤当前用户需要展示的异步路由
@@ -60,7 +59,7 @@ const useUserStore = defineStore('User', {
         //能保证当前async函数返回一个成功的promise
         return 'ok'
       } else {
-        return Promise.reject(new Error(result.data))
+        return Promise.reject(new Error(result.message))
       }
     },
     //获取用户信息方法
