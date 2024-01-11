@@ -25,6 +25,7 @@ import useLayOutSettingStore from '@/store/modules/setting';
 let LayOutSettingStore = useLayOutSettingStore();
 //获取路由对象
 let $route = useRoute();
+console.log('$route.matched',$route.matched)
 //点击图标的方法
 const changeIcon = () => {
     //图标进行切换

@@ -62,6 +62,7 @@ router.beforeEach(async (to: any, from: any, next: any) => {
 //全局后置守卫
 router.afterEach((to: any, from: any) => {
   nprogress.done()
+  window.document.title = to.meta.title
 })
 
 //第一个问题:任意路由切换实现进度条业务 ---nprogress
