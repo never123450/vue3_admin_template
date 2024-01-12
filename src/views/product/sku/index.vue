@@ -1,5 +1,6 @@
 <template>
   <el-card>
+    <el-button type="primary" size="default" icon="Plus" @click="addSKU" v-has="`btn.Trademark.add`">添加SKU</el-button>
     <el-table border style="margin: 10px 0px" :data="skuArr">
       <el-table-column
         label="序号"
@@ -50,7 +51,7 @@
             type="primary"
             size="small"
             icon="Edit"
-            @click="updateSku"
+            @click="updateSku(row)"
           ></el-button>
           <el-button
             type="primary"
@@ -143,10 +144,43 @@
       </template>
     </el-drawer>
   </el-card>
+
+  <el-dialog v-model="dialogFormVisible" :title="skuParams.id ? '修改SKU' : '添加SKU'">
+            <el-form style="width: 80%;" :model="skuParams" :rules="rules" ref="formRef">
+                <el-form-item label="SKU名称" label-width="100px" prop="skuName">
+                    <el-input placeholder="请您输入SKU名称" v-model="skuParams.skuName"></el-input>
+                </el-form-item>
+                <el-form-item label="描述" label-width="100px" prop="skuDesc">
+                    <el-input placeholder="请您输入描述" v-model="skuParams.skuDesc"></el-input>
+                </el-form-item>
+                <el-form-item label="图片" label-width="100px" prop="skuDefaultImg">
+                    <!-- upload组件属性:action图片上传路径书写/api,代理服务器不发送这次post请求  -->
+                    <el-upload class="avatar-uploader" action="/api/admin/product/fileUpload" :show-file-list="false"
+                        :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
+                        <img v-if="skuParams.skuDefaultImg" :src="skuParams.skuDefaultImg" class="avatar" />
+                        <el-icon v-else class="avatar-uploader-icon">
+                            <Plus />
+                        </el-icon>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item label="重量" label-width="100px" prop="weight">
+                    <el-input placeholder="请您输入重量" v-model="skuParams.weight"></el-input>
+                </el-form-item>
+                <el-form-item label="价格" label-width="100px" prop="price">
+                    <el-input placeholder="请您输入价格" v-model="skuParams.price"></el-input>
+                </el-form-item>
+            </el-form>
+            <!-- 具名插槽:footer -->
+            <template #footer>
+                <el-button type="primary" size="default" @click="cancel">取消</el-button>
+                <el-button type="primary" size="default" @click="confirm">确定</el-button>
+            </template>
+        </el-dialog>
+
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive} from 'vue'
 //引入请求
 import {
   reqSkuList,
@@ -154,6 +188,8 @@ import {
   reqCancelSale,
   reqSkuInfo,
   reqRemoveSku,
+  updateSkuInfo,
+  saveSkuInfo
 } from '@/api/product/sku'
 //引入ts类型
 import type {
@@ -161,7 +197,7 @@ import type {
   SkuData,
   SkuInfoData,
 } from '@/api/product/sku/type'
-import { ElMessage } from 'element-plus'
+import { ElMessage,UploadProps } from 'element-plus'
 //分页器当前页码
 let pageNo = ref<number>(1)
 //每一页展示几条数据
@@ -171,6 +207,49 @@ let skuArr = ref<SkuData[]>([])
 //控制抽屉显示与隐藏的字段
 let drawer = ref<boolean>(false)
 let skuInfo = ref<any>({})
+let dialogFormVisible = ref<boolean>(false)
+let skuParams = reactive<SkuData>({
+    skuName: '',
+    skuDesc: '',
+    weight:'',
+    price:'',
+    skuDefaultImg:''
+})
+//添加品牌按钮的回调
+const addSKU = () => {
+    //对话框显示
+    dialogFormVisible.value = true;
+   
+}
+//对话框底部取消按钮
+const cancel = () => {
+    //对话框隐藏
+    dialogFormVisible.value = false;
+}
+const confirm = async () => {
+  let result: any
+  if(skuParams.id){
+    result = await updateSkuInfo(skuParams)
+  }else{
+    result = await saveSkuInfo(skuParams)
+  }
+  if (result.code == 200) {
+    //提示信息
+    ElMessage({ type: 'success', message: '成功' })
+    //获取已有全部商品
+    getHasSku()
+  } else {
+    ElMessage({ type: 'error', message: result.data })
+  }
+   dialogFormVisible.value = false;
+}
+//图片上传成功钩子
+const handleAvatarSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
+    //response:即为当前这次上传图片post请求服务器返回的数据
+    //收集上传图片的地址,添加一个新的品牌的时候带给服务器
+    skuParams.skuDefaultImg = response.data;
+
+}
 //组件挂载完毕
 onMounted(() => {
   getHasSku()
@@ -210,8 +289,9 @@ const updateSale = async (row: SkuData) => {
   }
 }
 //更新已有的SKU
-const updateSku = () => {
-  ElMessage({ type: 'success', message: '程序员在努力的更新中....' })
+const updateSku = (row: SkuData) => {
+   dialogFormVisible.value = true;
+   Object.assign(skuParams, JSON.parse(JSON.stringify(row)))
 }
 //查看商品详情按钮的回调
 const findSku = async (row: SkuData) => {
