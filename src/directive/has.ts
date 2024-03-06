@@ -1,5 +1,7 @@
 import pinia from '@/store'
 import useUserStore from '@/store/modules/user'
+import { DirectiveBinding } from 'vue'
+
 const userStore = useUserStore(pinia)
 export const isHasButton = (app: any) => {
   //获取对应的用户仓库
@@ -14,4 +16,23 @@ export const isHasButton = (app: any) => {
       }
     },
   })
+}
+
+// 自定义滚动条
+export const myScroll = {
+  mounted(el: HTMLElement, binding: DirectiveBinding<any>) {
+    const self = binding.instance // this
+    const target = el.querySelector('.el-table__body-wrapper')
+    if (!target) return
+
+    target.addEventListener('scroll', () => {
+      // 滚动到底部
+      if (target.scrollTop + target.clientHeight >= target.scrollHeight) {
+        if (self.over >= self.dataList.length) {
+          return
+        }
+        self.over += 15
+      }
+    })
+  },
 }

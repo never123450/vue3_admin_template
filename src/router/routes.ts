@@ -146,6 +146,27 @@ export const asnycRoute = [
       },
     ],
   },
+  {
+    path: '/highlights',
+    component: () => import('@/layout/index.vue'),
+    name: 'Highlights',
+    meta: {
+      title: '项目亮点管理',
+      icon: 'DataLine',
+    },
+    redirect: '/highlights/largeData',
+    children: [
+      {
+        path: '/highlights/largeData',
+        component: () => import('@/views/highlights/largeData/index.vue'),
+        name: 'LargeData',
+        meta: {
+          title: 'el-table 大量数据滚动',
+          icon: 'ShoppingCartFull',
+        },
+      },
+    ],
+  },
 ]
 
 //任意路由
